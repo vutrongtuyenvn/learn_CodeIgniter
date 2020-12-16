@@ -2,8 +2,8 @@
 
 require(APPPATH . 'libraries/RestController.php') ;
 require(APPPATH . 'libraries/Format.php');
-
-class TestApi extends \chriskacerguis\RestServer\RestController
+//require(APPPATH . 'libraries/Authorization_Token');
+class ProductApi extends \chriskacerguis\RestServer\RestController
 {
 
 	/**
@@ -14,6 +14,32 @@ class TestApi extends \chriskacerguis\RestServer\RestController
 		parent::__construct();
 		$this->load->model("products/Product");
 		$this->load->library(array("form_validation"),"security");
+		$this->load->library("Authorization_Token");
+
+	}
+	public function jwt_get(){
+//		header("Access-Control-Allow-Origin: *");
+		$payload = [
+			'id' => "1221",
+			'other' => "Some other data"
+		];
+		$token=$this->authorization_token->generateToken($payload);
+		$this->response(array(
+			"token"=>$token,
+			"message"=>"success",
+			"error"=>0
+		),\chriskacerguis\RestServer\RestController::HTTP_OK);
+
+	}
+	public function jwt_post(){
+			header("Access-Control-Allow-Origin: *");
+			$isValidate=$this->authorization_token->validateToken();
+			$this->response(array(
+				"isValidate"=>$isValidate,
+				"message"=>"success",
+				"error"=>0
+			),\chriskacerguis\RestServer\RestController::HTTP_OK);
+
 	}
 	public function index_get(){
 		$product=$this->Product->getProducts();
